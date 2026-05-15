@@ -19,14 +19,14 @@ export default function CustomCursor() {
     if (window.matchMedia("(hover: none)").matches) return;
 
     const moveCursor = (e: MouseEvent) => {
-      mouseX.set(e.clientX - 8); // center the 16px cursor
-      mouseY.set(e.clientY - 8);
+      // The container will exactly follow the raw pointer coordinates
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
       if (!isVisible) setIsVisible(true);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Check if hovering over interactive elements
       if (
         target.tagName.toLowerCase() === "a" || 
         target.tagName.toLowerCase() === "button" || 
@@ -53,18 +53,46 @@ export default function CustomCursor() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 z-[100] rounded-full pointer-events-none mix-blend-difference bg-white"
+      className="fixed top-0 left-0 z-[100] pointer-events-none mix-blend-difference"
       style={{
         x: cursorX,
         y: cursorY,
-        width: 16,
-        height: 16,
       }}
-      animate={{
-        scale: isHovering ? 3.5 : 1,
-        opacity: isHovering ? 1 : 0.8,
-      }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-    />
+    >
+      {/* The Hover Circle (Centered on pointer) */}
+      <motion.div
+        className="bg-white rounded-full absolute"
+        style={{ top: -16, left: -16, width: 32, height: 32 }}
+        animate={{
+          opacity: isHovering ? 1 : 0,
+          scale: isHovering ? 1 : 0.5,
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      />
+
+      {/* The Angled Triangle (Tip at pointer) */}
+      <motion.svg
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="white"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ position: 'absolute', top: 0, left: 0 }}
+        animate={{
+          opacity: isHovering ? 0 : 1,
+          scale: isHovering ? 0 : 1,
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        className="origin-top-left"
+      >
+        {/* Elongated angled triangle with rounded points */}
+        <path 
+          d="M1 1L18 6.5L8.5 8.5L6.5 18L1 1Z" 
+          stroke="white" 
+          strokeWidth="2" 
+          strokeLinejoin="round" 
+        />
+      </motion.svg>
+    </motion.div>
   );
 }
