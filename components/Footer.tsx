@@ -29,7 +29,7 @@ export default function Footer() {
         </div>
 
         {/* Links Column */}
-        <div className="pt-8 md:pt-0">
+        <div className="pt-8 md:pt-0 flex flex-col sm:flex-row gap-12 sm:gap-24">
           <div className="flex flex-col gap-y-3 font-mono">
             <p className="mb-2 text-[0.65rem] tracking-[0.2em] uppercase text-white/40 font-bold">
               Vectors
@@ -38,13 +38,13 @@ export default function Footer() {
               href="/collection/aero"
               className="text-sm text-white/60 hover:text-white transition-colors uppercase tracking-widest"
             >
-              Aero Collection
+              Aero
             </Link>
             <Link
               href="/collection/signature"
               className="text-sm text-white/60 hover:text-white transition-colors uppercase tracking-widest"
             >
-              Signature Collection
+              Signature
             </Link>
             <Link
               href="/about"
@@ -52,6 +52,36 @@ export default function Footer() {
             >
               About Us
             </Link>
+          </div>
+
+          <div className="flex flex-col gap-y-3 font-mono">
+            <p className="mb-2 text-[0.65rem] tracking-[0.2em] uppercase text-white/40 font-bold">
+              Intel
+            </p>
+            <a
+              href="https://deltav-shop.fourthwall.com/pages/terms-of-service"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-white/60 hover:text-white transition-colors uppercase tracking-widest"
+            >
+              Terms of Service
+            </a>
+            <a
+              href="https://deltav-shop.fourthwall.com/pages/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-white/60 hover:text-white transition-colors uppercase tracking-widest"
+            >
+              Privacy Policy
+            </a>
+            <a
+              href="https://deltav-shop.fourthwall.com/pages/returns-faq"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-white/60 hover:text-white transition-colors uppercase tracking-widest"
+            >
+              Returns FAQ
+            </a>
           </div>
         </div>
       </div>

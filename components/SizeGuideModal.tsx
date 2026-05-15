@@ -25,6 +25,8 @@ const sweatshirtData = [
   { size: "2XL", length: "80", width: "73", sleeve: "68" },
 ];
 
+const toIn = (cm: string) => (Number(cm) * 0.393701).toFixed(1);
+
 export default function SizeGuideModal({ isOpen, onClose, productType }: SizeGuideModalProps) {
   const isSweatshirt = productType === "sweatshirt";
   const data = isSweatshirt ? sweatshirtData : tshirtData;
@@ -89,15 +91,15 @@ export default function SizeGuideModal({ isOpen, onClose, productType }: SizeGui
                     <th className="text-left py-3 pr-4 text-white/40 uppercase tracking-widest font-normal">
                       Size
                     </th>
-                    <th className="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal">
-                      Length (cm)
+                    <th className="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal whitespace-nowrap">
+                      Length
                     </th>
-                    <th className="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal">
-                      Width (cm)
+                    <th className="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal whitespace-nowrap">
+                      Width
                     </th>
                     {isSweatshirt && (
-                      <th className="text-center py-3 pl-4 text-white/40 uppercase tracking-widest font-normal">
-                        Sleeve (cm)
+                      <th className="text-center py-3 pl-4 text-white/40 uppercase tracking-widest font-normal whitespace-nowrap">
+                        Sleeve
                       </th>
                     )}
                   </tr>
@@ -115,10 +117,16 @@ export default function SizeGuideModal({ isOpen, onClose, productType }: SizeGui
                       <td className="py-3 pr-4 text-white font-semibold">
                         {row.size}
                       </td>
-                      <td className="text-center py-3 px-4">{row.length}</td>
-                      <td className="text-center py-3 px-4">{row.width}</td>
+                      <td className="text-center py-3 px-4 whitespace-nowrap">
+                        {row.length}cm <span className="text-white/30 hidden sm:inline">({toIn(row.length)}")</span>
+                      </td>
+                      <td className="text-center py-3 px-4 whitespace-nowrap">
+                        {row.width}cm <span className="text-white/30 hidden sm:inline">({toIn(row.width)}")</span>
+                      </td>
                       {isSweatshirt && (
-                        <td className="text-center py-3 pl-4">{(row as any).sleeve}</td>
+                        <td className="text-center py-3 pl-4 whitespace-nowrap">
+                          {(row as any).sleeve}cm <span className="text-white/30 hidden sm:inline">({toIn((row as any).sleeve)}")</span>
+                        </td>
                       )}
                     </tr>
                   ))}
