@@ -1,0 +1,251 @@
+/* ─── Google Fonts (must precede @import "tailwindcss") ────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
+
+@import "tailwindcss";
+
+/* ─── Tailwind v4 Theme Extensions ──────────────────────────────────────── */
+@theme {
+  --font-syncopate: "Syncopate", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────────── */
+body {
+  font-family: var(--font-inter);
+  background-color: #000;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* ─── Font Utilities ──────────────────────────────────────────────────────── */
+.font-syncopate {
+  font-family: var(--font-syncopate);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* ─── Beams CTA Button ───────────────────────────────────────────────────── */
+.beams-cta {
+  pointer-events: auto;
+  background: #e0e0e0;
+  color: #0a0a0a;
+  padding: 1rem 2rem;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 88% 100%, 0 100%);
+  transition: background 0.3s, transform 0.3s;
+  display: inline-block;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+}
+.beams-cta:hover:not(:disabled) {
+  background: #ffffff;
+  transform: translateY(-5px);
+}
+.beams-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Nav Link Underline ──────────────────────────────────────────────────── */
+.nav-link {
+  position: relative;
+  display: inline-block;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #fff;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.3s ease-out;
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* ─── Hidden Scrollbar ────────────────────────────────────────────────────── */
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ─── Liquid Glass Product Card ───────────────────────────────────────────── */
+.glass-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: visible;
+}
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(255, 255, 255, 0.03);
+}
+
+.glass-card .card-img-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+.glass-card .card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5));
+}
+.glass-card:hover .card-img-wrap img {
+  transform: scale(1.04);
+}
+
+/* ─── Glass Info Footer ───────────────────────────────────────────────────── */
+.glass-info {
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.25rem;
+}
+
+/* ─── Marquee Title Auto-Scroll ───────────────────────────────────────────── */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% + 120px));
+  }
+}
+.auto-scroll-title {
+  display: inline-block;
+}
+.glass-card:hover .auto-scroll-title {
+  animation: marquee-scroll 4s linear infinite alternate;
+}
+
+/* ─── Beams Flow Animation ────────────────────────────────────────────────── */
+@keyframes beamsFlow {
+  0%,
+  100% {
+    transform: translateX(-50%) scaleY(0);
+    transform-origin: top;
+  }
+  50% {
+    transform: translateX(-50%) scaleY(1);
+    transform-origin: top;
+  }
+  51% {
+    transform: translateX(-50%) scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+/* ─── Spinner ─────────────────────────────────────────────────────────────── */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.spinner-dark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* ─── Touch Device: always show remove buttons ────────────────────────────── */
+@media (hover: none) {
+  .group\/item .remove-item-btn {
+    opacity: 1 !important;
+  }
+}
+
+/* ─── Image blend fix ─────────────────────────────────────────────────────── */
+.product-img {
+  mix-blend-mode: normal;
+}
+
+/* ─── Product Description Typography ──────────────────────────────────────── */
+.product-description {
+  font-family: var(--font-inter);
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: none;
+}
+.product-description p {
+  margin-bottom: 1rem;
+}
+.product-description strong,
+.product-description b {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+.product-description em,
+.product-description i {
+  color: rgba(255, 255, 255, 0.7);
+}
+.product-description ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+.product-description ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+.product-description li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.product-description a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+.product-description a:hover {
+  color: #fff;
+}
+.product-description h2,
+.product-description h3,
+.product-description h4 {
+  color: #fff;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}

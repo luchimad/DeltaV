@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Delta V</title>
+    <meta name="description" content="Aerospace apparel and domestic production." />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; }
+        .font-syncopate { font-family: 'Syncopate', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .beams-cta {
+            pointer-events: auto;
+            background: #e0e0e0;
+            color: #0a0a0a;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 88% 100%, 0 100%);
+            transition: background 0.3s, transform 0.3s;
+            display: inline-block;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+        }
+
+        .beams-cta:hover:not(:disabled) {
+            background: #ffffff;
+            transform: translateY(-5px);
+        }
+        
+        .beams-cta:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes beamsFlow {
+            0%, 100% { transform: translateX(-50%) scaleY(0); transform-origin: top; }
+            50% { transform: translateX(-50%) scaleY(1); transform-origin: top; }
+            51% { transform: translateX(-50%) scaleY(1); transform-origin: bottom; }
+        }
+        
+        .nav-link { position: relative; display: inline-block; }
+        .nav-link::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+            background-color: #fff; transform: scaleX(0); transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+        .nav-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
+
+        /* Carousel */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Liquid Glass Product Card */
+        .glass-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: visible;
+        }
+        .glass-card:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(255,255,255,0.03);
+        }
+        .glass-card .card-img-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+        .glass-card .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+        }
+        .glass-card:hover .card-img-wrap img {
+            transform: scale(1.04);
+        }
+        .glass-info {
+            backdrop-filter: blur(20px) saturate(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(1.2);
+            background: rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 1rem 1.25rem;
+        }
+
+        /* Cart Drawer */
+        #cart-drawer { transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .cart-open { transform: translateX(0) !important; }
+        .cart-closed { transform: translateX(100%); }
+        #cart-overlay { transition: opacity 0.3s ease-in-out; }
+        
+        /* Mobile Nav */
+        #mobile-nav { transition: opacity 0.4s ease, visibility 0.4s ease; }
+        #mobile-nav.nav-visible { opacity: 1; visibility: visible; }
+        #mobile-nav.nav-hidden { opacity: 0; visibility: hidden; }
+        .mobile-nav-link {
+            font-family: 'Syncopate', sans-serif;
+            text-transform: uppercase;
+            font-size: clamp(2rem, 8vw, 4rem);
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.7);
+            transition: color 0.3s ease;
+            line-height: 1.2;
+        }
+        .mobile-nav-link:hover { color: #fff; }
+
+        /* Size Guide Modal */
+        #size-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #size-modal.modal-visible { opacity: 1; visibility: visible; }
+        #size-modal.modal-hidden { opacity: 0; visibility: hidden; }
+
+        @keyframes marquee-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-100% + 120px)); }
+        }
+        .auto-scroll-title { display: inline-block; }
+        .glass-card:hover .auto-scroll-title {
+            animation: marquee-scroll 4s linear infinite alternate;
+        }
+        
+        /* Spinner */
+        .spinner {
+            width: 24px; height: 24px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Remove btn always visible on touch */
+        @media (hover: none) {
+            .group\/item .remove-item-btn { opacity: 1 !important; }
+        }
+
+        /* Image mix-blend fix for dark backgrounds */
+        .product-img { mix-blend-mode: normal; }
+    </style>
+</head>
+
+<body class="bg-black text-white antialiased min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="fixed top-0 inset-x-0 z-40 transition-all duration-300 bg-black/80 backdrop-blur-md border-b border-white/10">
+        <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a class="flex items-center hover:opacity-70 transition-opacity" href="#/">
+                <img src="../Assets/LogoNoText_White.png" alt="Delta V Logo" class="h-6 w-auto object-contain">
+            </a>
+            <div class="hidden md:flex items-center gap-8 font-mono text-[0.65rem] tracking-[0.1em] uppercase font-semibold">
+                <a class="nav-link py-2 text-white/80 hover:text-white" href="#/collection/aero">Aero</a>
+                <a class="nav-link py-2 text-white/80 hover:text-white" href="#/collection/signature">Signature</a>
+                <a class="nav-link py-2 text-white/80 hover:text-white" href="#/about">About</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleCart()" class="relative text-white/80 hover:text-white transition-colors group flex items-center gap-2">
+                    <span class="font-mono text-[0.65rem] tracking-widest hidden md:block">MANIFEST</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 6h12l-1 12H5L4 6z"/><path d="M7 6V4a2 2 0 1 1 4 0v2"/></svg>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-white text-black text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center opacity-0 transition-opacity">0</span>
+                </button>
+                <!-- Mobile hamburger -->
+                <button id="mobile-menu-btn" onclick="toggleMobileNav()" class="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] group" aria-label="Menu">
+                    <span id="ham-top" class="block w-5 h-px bg-white transition-all duration-300 origin-center"></span>
+                    <span id="ham-mid" class="block w-5 h-px bg-white transition-all duration-300"></span>
+                    <span id="ham-bot" class="block w-5 h-px bg-white transition-all duration-300 origin-center"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Nav Overlay -->
+    <div id="mobile-nav" class="nav-hidden fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex flex-col justify-center items-center gap-8 md:hidden">
+        <button onclick="toggleMobileNav()" class="absolute top-5 right-6 text-white/50 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 7L7 21M7 7l14 14"/></svg>
+        </button>
+        <div class="text-center flex flex-col gap-6">
+            <a class="mobile-nav-link" href="#/collection/aero" onclick="toggleMobileNav()">Aero</a>
+            <a class="mobile-nav-link" href="#/collection/signature" onclick="toggleMobileNav()">Signature</a>
+            <a class="mobile-nav-link" href="#/about" onclick="toggleMobileNav()">About</a>
+        </div>
+        <div class="absolute bottom-8 font-mono text-[0.6rem] tracking-[0.2em] text-white/30 uppercase">Delta V Aerospace &mdash; Define Your Vector</div>
+    </div>
+
+    <!-- Size Guide Modal -->
+    <div id="size-modal" class="modal-hidden fixed inset-0 z-[70] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeSizeGuide()"></div>
+        <div class="relative z-10 bg-neutral-900 border border-white/10 p-8 max-w-lg w-full shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <p class="font-mono text-[0.6rem] tracking-[0.2em] uppercase text-white/40 mb-1">Reference Document</p>
+                    <h3 class="font-syncopate uppercase text-white text-lg tracking-wider">Size Matrix</h3>
+                </div>
+                <button onclick="closeSizeGuide()" class="text-white/40 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full font-mono text-xs text-white/70">
+                    <thead>
+                        <tr class="border-b border-white/10">
+                            <th class="text-left py-3 pr-4 text-white/40 uppercase tracking-widest font-normal">Size</th>
+                            <th class="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal">Chest (in)</th>
+                            <th class="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal">Length (in)</th>
+                            <th class="text-center py-3 pl-4 text-white/40 uppercase tracking-widest font-normal">Shoulder (in)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-white/5"><td class="py-3 pr-4 text-white font-semibold">XS</td><td class="text-center py-3 px-4">33&ndash;35</td><td class="text-center py-3 px-4">27</td><td class="text-center py-3 pl-4">16</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-3 pr-4 text-white font-semibold">S</td><td class="text-center py-3 px-4">35&ndash;37</td><td class="text-center py-3 px-4">28</td><td class="text-center py-3 pl-4">17</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-3 pr-4 text-white font-semibold">M</td><td class="text-center py-3 px-4">38&ndash;40</td><td class="text-center py-3 px-4">29</td><td class="text-center py-3 pl-4">18</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-3 pr-4 text-white font-semibold">L</td><td class="text-center py-3 px-4">41&ndash;43</td><td class="text-center py-3 px-4">30</td><td class="text-center py-3 pl-4">19</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-3 pr-4 text-white font-semibold">XL</td><td class="text-center py-3 px-4">44&ndash;46</td><td class="text-center py-3 px-4">31</td><td class="text-center py-3 pl-4">20</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-3 pr-4 text-white font-semibold">2XL</td><td class="text-center py-3 px-4">47&ndash;49</td><td class="text-center py-3 px-4">32</td><td class="text-center py-3 pl-4">21</td></tr>
+                        <tr><td class="py-3 pr-4 text-white font-semibold">3XL</td><td class="text-center py-3 px-4">50&ndash;52</td><td class="text-center py-3 px-4">33</td><td class="text-center py-3 pl-4">22</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="mt-6 text-[0.6rem] font-mono text-white/30 uppercase tracking-widest">All measurements in inches. Products are true to size. Size up for oversized fit.</p>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 opacity-0 pointer-events-none" onclick="toggleCart()"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[440px] bg-neutral-900 z-50 cart-closed flex flex-col border-l border-white/10 shadow-2xl">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center">
+            <h2 class="font-syncopate uppercase text-lg tracking-wider">Operational Manifest</h2>
+            <button onclick="toggleCart()" class="text-white/50 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 font-mono text-sm">
+            <div class="text-white/30 uppercase tracking-widest text-center mt-10">Manifest Empty</div>
+        </div>
+        <div class="p-6 border-t border-white/10 bg-black">
+            <div class="flex justify-between font-mono text-sm uppercase text-white/70 mb-4">
+                <span>Subtotal</span>
+                <span id="cart-subtotal">$0.00</span>
+            </div>
+            <button id="checkout-btn" onclick="checkout()" class="w-full beams-cta text-center !block" disabled>Authorize Checkout</button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main id="app-root" class="flex-1 mt-16">
+        <!-- Route views injected here -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full pb-0 border-t border-white/10 bg-black mt-20">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between p-10 max-w-7xl mx-auto">
+            <div class="flex flex-col items-start justify-start gap-y-5 max-w-xs mx-0">
+                <a class="flex items-center hover:opacity-70 transition-opacity" href="#/">
+                    <img src="../Assets/LogoNoText_White.png" alt="Delta V" class="h-8 w-auto object-contain">
+                </a>
+                <p class="text-white/50 text-sm leading-relaxed">Aerospace and defense apparel engineered for the trajectory of the high-end aviator. Ultimate heavyweights, precision bombers, absolute stealth execution.</p>
+                <p class="text-[0.65rem] tracking-[0.2em] uppercase text-white/40 font-mono font-bold">Vector Log: Active</p>
+            </div>
+            <div class="pt-8 md:pt-0">
+                <div class="flex flex-col gap-y-3 font-mono">
+                    <p class="mb-2 text-[0.65rem] tracking-[0.2em] uppercase text-white/40 font-bold">Systems</p>
+                    <a href="#/collection/aero" class="text-sm text-white/60 hover:text-white transition-colors uppercase tracking-widest">Aero Collection</a>
+                    <a href="#/collection/signature" class="text-sm text-white/60 hover:text-white transition-colors uppercase tracking-widest">Signature Collection</a>
+                    <a href="#/about" class="text-sm text-white/60 hover:text-white transition-colors uppercase tracking-widest">About Us</a>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white/5 border-t border-white/10 py-6 mt-8">
+            <p class="text-center text-[0.65rem] text-white/40 tracking-[0.15em] uppercase font-mono font-bold">© 2024 DELTA V AEROSPACE LLC</p>
+        </div>
+    </footer>
+
+    <script>
+        const STOREFRONT_TOKEN = "";
+        const API_BASE = "https://storefront-api.fourthwall.com/v1";
+        const CHECKOUT_DOMAIN = "deltav-shop.fourthwall.com";
+
+        // State
+        let cartId = localStorage.getItem("cartId");
+        let cartData = null;
+        let productsCache = {};
+        let mobileNavOpen = false;
+
+        // --- DOM Elements ---
+        const appRoot = document.getElementById('app-root');
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartOverlay = document.getElementById('cart-overlay');
+        const cartCount = document.getElementById('cart-count');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartSubtotal = document.getElementById('cart-subtotal');
+        const checkoutBtn = document.getElementById('checkout-btn');
+
+        // --- Router ---
+        window.addEventListener('hashchange', route);
+        window.addEventListener('load', () => {
+            initCart();
+            route();
+        });
+
+        function route() {
+            // Close mobile nav if open
+            if (mobileNavOpen) toggleMobileNav();
+            window.scrollTo(0, 0);
+            const hash = location.hash || '#/';
+            appRoot.innerHTML = '<div class="flex justify-center items-center h-64"><div class="spinner"></div></div>';
+            
+            if (hash === '#/' || hash === '') {
+                renderHome();
+            } else if (hash.startsWith('#/collection/')) {
+                const slug = hash.split('/')[2];
+                renderCollection(slug);
+            } else if (hash.startsWith('#/product/')) {
+                const slug = hash.split('/').slice(2).join('/');
+                renderProduct(slug);
+            } else if (hash === '#/about') {
+                renderAbout();
+            } else {
+                renderHome();
+            }
+        }
+
+        // --- Views ---
+        async function renderHome() {
+            try {
+                // Fetch all products for carousel
+                const res = await fetch(`${API_BASE}/collections/all/products?storefront_token=${STOREFRONT_TOKEN}`);
+                const data = await res.json();
+                const products = data.results || [];
+                
+                let carouselHTML = '';
+                products.forEach(p => {
+                    const price = p.variants && p.variants[0] ? p.variants[0].unitPrice.value : 0;
+                    const img = p.images && p.images[0] ? p.images[0].url : '';
+                    carouselHTML += `
+                        <a href="#/product/${p.slug}" class="flex-none w-[260px] sm:w-[300px] glass-card group snap-center sm:snap-start" style="aspect-ratio:3/4;">
+                            <div class="card-img-wrap">
+                                <img src="${img}" alt="${p.name}">
+                            </div>
+                            <div class="glass-info">
+                                <p class="text-[0.55rem] tracking-[0.2em] uppercase text-white/40 mb-1 font-mono">$${price.toFixed(2)}</p>
+                                <div class="overflow-hidden whitespace-nowrap" style="-webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%); mask-image: linear-gradient(to right, #000 85%, transparent 100%);">
+                                    <h3 class="text-white text-sm tracking-tight font-syncopate uppercase auto-scroll-title pr-8">${p.name}</h3>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                });
+
+                appRoot.innerHTML = `
+                    <!-- Hero -->
+                    <div class="relative h-[85vh] w-full overflow-hidden bg-black flex flex-col justify-center items-center">
+                        <div class="absolute inset-0 z-0 opacity-60">
+                            <canvas id="heroCanvas" class="w-full h-full block"></canvas>
+                        </div>
+                        <div class="absolute inset-0 z-[1] bg-gradient-to-t from-black/80 via-transparent to-black/60 pointer-events-none"></div>
+                        
+                        <div class="z-10 flex flex-col items-center gap-12 w-full max-w-7xl px-6">
+                            <img src="../Assets/LogoText_White.png" alt="Delta V Logo" class="w-full max-w-2xl opacity-90 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                            
+                            <div class="absolute bottom-12 left-6 sm:left-12 font-mono text-[0.65rem] tracking-[0.1em] text-white/50 leading-loose uppercase hidden sm:block">
+                                <div>[ EST. 2024 ]</div>
+                                <div>AEROSPACE APPAREL</div>
+                                <div class="text-white mt-1">DEFINE YOUR VECTOR</div>
+                            </div>
+                        </div>
+                        <div style="position:absolute;bottom:2rem;left:50%;width:1px;height:60px;background:linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);animation:beamsFlow 2s infinite ease-in-out;z-index:20"></div>
+                    </div>
+
+                    <!-- Carousel Section -->
+                    <section class="py-20 border-t border-white/10">
+                        <div class="max-w-[100vw] overflow-hidden">
+                            <div class="px-6 md:px-12 mb-10 flex justify-between items-end">
+                                <div>
+                                    <p class="text-[0.65rem] tracking-[0.25em] uppercase text-white/40 mb-2 font-mono font-bold">Active Deployment</p>
+                                    <h2 class="text-2xl md:text-3xl text-white tracking-tight font-syncopate uppercase">All Systems</h2>
+                                </div>
+                                <div class="hidden sm:flex gap-4">
+                                    <button onclick="document.getElementById('carousel').scrollBy({left:-350, behavior:'smooth'})" class="w-10 h-10 border border-white/20 flex items-center justify-center hover:bg-white/10 transition text-white/50 hover:text-white">&larr;</button>
+                                    <button onclick="document.getElementById('carousel').scrollBy({left:350, behavior:'smooth'})" class="w-10 h-10 border border-white/20 flex items-center justify-center hover:bg-white/10 transition text-white/50 hover:text-white">&rarr;</button>
+                                </div>
+                            </div>
+                            <div id="carousel" class="flex gap-4 px-6 md:px-12 overflow-x-auto hide-scroll snap-x snap-mandatory pb-8">
+                                ${carouselHTML}
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Collections Buttons Sladetech Style -->
+                    <section class="border-t border-white/10">
+                        <div class="grid grid-cols-1 md:grid-cols-2">
+                            <a href="#/collection/aero" class="group relative aspect-square sm:aspect-[4/3] bg-neutral-900 border-r border-b border-white/10 overflow-hidden flex items-end p-8 md:p-16">
+                                <div class="absolute inset-0 bg-[url('../Assets/f16_2.png')] bg-cover bg-center opacity-20 mix-blend-luminosity group-hover:opacity-40 group-hover:scale-105 transition-all duration-700"></div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                                <div class="relative z-10 w-full flex justify-between items-end">
+                                    <div>
+                                        <p class="font-mono text-[0.65rem] tracking-[0.2em] text-white/50 mb-2 uppercase">Core Domain</p>
+                                        <h3 class="font-syncopate text-3xl md:text-4xl uppercase text-white">Aero</h3>
+                                    </div>
+                                    <div class="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" class="-rotate-45"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="#/collection/signature" class="group relative aspect-square sm:aspect-[4/3] bg-neutral-900 border-b border-white/10 overflow-hidden flex items-end p-8 md:p-16">
+                                <div class="absolute inset-0 bg-[url('../Assets/skyhawk1.png')] bg-cover bg-center opacity-20 mix-blend-luminosity group-hover:opacity-40 group-hover:scale-105 transition-all duration-700"></div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                                <div class="relative z-10 w-full flex justify-between items-end">
+                                    <div>
+                                        <p class="font-mono text-[0.65rem] tracking-[0.2em] text-white/50 mb-2 uppercase">Core Domain</p>
+                                        <h3 class="font-syncopate text-3xl md:text-4xl uppercase text-white">Signature</h3>
+                                    </div>
+                                    <div class="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors duration-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" class="-rotate-45"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                `;
+                initHeroCanvas();
+            } catch (err) {
+                console.error(err);
+                appRoot.innerHTML = '<div class="text-center py-32 font-mono text-white/50">Error establishing comm link.</div>';
+            }
+        }
+
+        async function renderCollection(slug) {
+            try {
+                const res = await fetch(`${API_BASE}/collections/${slug}/products?storefront_token=${STOREFRONT_TOKEN}`);
+                const data = await res.json();
+                const products = data.results || [];
+
+                let gridHTML = '';
+                if (products.length === 0) {
+                    gridHTML = '<div class="col-span-full py-32 text-center font-mono text-white/40 uppercase tracking-widest">No assets deployed in this sector.</div>';
+                } else {
+                    products.forEach(p => {
+                        const price = p.variants && p.variants[0] ? p.variants[0].unitPrice.value : 0;
+                        const img = p.images && p.images[0] ? p.images[0].url : '';
+                        gridHTML += `
+                            <a href="#/product/${p.slug}" class="glass-card group" style="aspect-ratio:3/4;">
+                                <div class="card-img-wrap">
+                                    <img src="${img}" alt="${p.name}">
+                                </div>
+                                <div class="glass-info flex justify-between items-end gap-2">
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-[0.55rem] tracking-[0.2em] uppercase text-white/40 mb-1 font-mono">$${price.toFixed(2)}</p>
+                                        <div class="overflow-hidden whitespace-nowrap" style="-webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%); mask-image: linear-gradient(to right, #000 85%, transparent 100%);">
+                                            <h3 class="text-white text-base tracking-tight font-syncopate uppercase auto-scroll-title pr-8">${p.name}</h3>
+                                        </div>
+                                    </div>
+                                    <div class="hidden sm:flex text-[0.55rem] font-mono tracking-widest text-white/40 uppercase group-hover:text-white transition-colors items-center gap-2 flex-shrink-0">
+                                        View <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="-rotate-45"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    });
+                }
+
+                appRoot.innerHTML = `
+                    <div class="pt-20 pb-12 px-6 max-w-7xl mx-auto border-b border-white/10">
+                        <a href="#/" class="inline-flex items-center gap-2 font-mono text-[0.65rem] tracking-widest text-white/40 hover:text-white uppercase mb-8 transition-colors">&larr; Return</a>
+                        <p class="text-[0.7rem] tracking-[0.25em] uppercase text-white/50 mb-2 font-mono font-bold">Domain</p>
+                        <h1 class="text-4xl md:text-5xl text-white tracking-tight font-syncopate uppercase">${slug} Collection</h1>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto px-6 mt-10">
+                        ${gridHTML}
+                    </div>
+                `;
+            } catch (err) {
+                appRoot.innerHTML = '<div class="text-center py-32 font-mono text-white/50">Error loading collection.</div>';
+            }
+        }
+
+        async function renderProduct(slug) {
+            try {
+                const res = await fetch(`${API_BASE}/products/${slug}?storefront_token=${STOREFRONT_TOKEN}`);
+                const product = await res.json();
+                
+                if(!product || !product.id) throw new Error("Product not found");
+                productsCache[product.id] = product;
+
+                const img = product.images && product.images[0] ? product.images[0].url : '';
+                const price = product.variants && product.variants[0] ? product.variants[0].unitPrice.value : 0;
+                
+                // Image Gallery HTML
+                let imagesHTML = '';
+                if (product.images && product.images.length > 0) {
+                    product.images.forEach(img => {
+                        imagesHTML += `
+                            <div class="snap-center flex-shrink-0 w-full h-full flex items-center justify-center p-8 bg-neutral-900">
+                                <img src="${img.url}" alt="${product.name}" class="max-w-full max-h-full object-contain opacity-95 drop-shadow-2xl product-img">
+                            </div>
+                        `;
+                    });
+                }
+                
+                let initialControlsHTML = '';
+                if (product.images && product.images.length > 1) {
+                    initialControlsHTML = `
+                        <button onclick="document.getElementById('product-gallery').scrollBy({left:-window.innerWidth*0.5, behavior:'smooth'})" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-black/40 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 border border-white/10 z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M14 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button onclick="document.getElementById('product-gallery').scrollBy({left:window.innerWidth*0.5, behavior:'smooth'})" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-black/40 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 border border-white/10 z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M10 18l6-6-6-6"/></svg>
+                        </button>
+                    `;
+                }
+
+                // Variants logic
+                let colors = {};
+                let sizes = [];
+                if (product.variants) {
+                    product.variants.forEach(v => {
+                        if (v.attributes.color) colors[v.attributes.color.name] = v.attributes.color.swatch;
+                        if (v.attributes.size && !sizes.includes(v.attributes.size.name)) sizes.push(v.attributes.size.name);
+                    });
+                }
+
+                window.currentProduct = product;
+                window.currentProductVariants = product.variants || [];
+                window.selectedColor = Object.keys(colors).length > 0 ? Object.keys(colors)[0] : null;
+                window.selectedSize = sizes.length > 0 ? sizes[0] : null;
+
+                let variantHTML = '';
+                if (Object.keys(colors).length > 0) {
+                    variantHTML += '<div class="mb-6"><p class="text-[0.65rem] tracking-[0.2em] text-white/50 mb-3 uppercase font-mono">Color</p><div class="flex gap-3">';
+                    Object.keys(colors).forEach((c, i) => {
+                        const swatch = colors[c] || '#fff';
+                        variantHTML += `<button class="color-btn w-8 h-8 rounded-full border border-white/20 transition-all hover:scale-110 ${i===0 ? '!border-white !scale-110' : ''}" style="background-color: ${swatch};" onclick="selectColor(this, '${c.replace(/'/g, "\\'")}')" title="${c}"></button>`;
+                    });
+                    variantHTML += '</div></div>';
+                }
+
+                if (sizes.length > 0) {
+                    variantHTML += `
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <p class="text-[0.65rem] tracking-[0.2em] text-white/50 uppercase font-mono">Size</p>
+                                <button class="text-[0.6rem] font-mono text-white/40 hover:text-white underline underline-offset-4 uppercase tracking-widest" onclick="openSizeGuide()">Size Guide</button>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                    `;
+                    sizes.forEach((s, i) => {
+                        variantHTML += `<button class="size-btn border border-white/20 font-mono text-xs px-4 py-2 hover:border-white hover:text-white transition-colors text-white/70 ${i===0 ? '!border-white !text-white !bg-white/10' : ''}" onclick="selectSize(this, '${s}')">${s}</button>`;
+                    });
+                    variantHTML += '</div></div>';
+                }
+
+                const desc = product.description || '';
+
+                appRoot.innerHTML = `
+                    <div class="max-w-7xl mx-auto border-b border-l border-r border-white/10 flex flex-col md:flex-row min-h-[70vh]">
+                        <!-- Image Gallery -->
+                        <div id="gallery-wrapper" class="w-full md:w-3/5 border-b md:border-b-0 border-white/10 aspect-square md:aspect-auto relative group">
+                            <div id="product-gallery" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scroll relative">
+                                ${imagesHTML}
+                            </div>
+                            ${initialControlsHTML}
+                        </div>
+                        
+                        <!-- Details -->
+                        <div class="w-full md:w-2/5 p-8 md:p-12 flex flex-col">
+                            <a href="javascript:history.back()" class="inline-flex items-center gap-2 font-mono text-[0.65rem] tracking-widest text-white/40 hover:text-white uppercase mb-8 transition-colors">&larr; Back</a>
+                            
+                            <h1 class="text-3xl sm:text-4xl text-white tracking-tight font-syncopate uppercase mb-4 leading-tight">${product.name}</h1>
+                            <div id="price-display" class="font-mono text-xl text-white/80 mb-8 tracking-widest">$${price.toFixed(2)}</div>
+                            
+                            <div class="prose prose-invert prose-sm font-inter text-white/60 mb-10 leading-relaxed max-w-none prose-p:mb-4 prose-li:my-1 prose-ul:list-disc prose-ul:pl-4">
+                                ${desc}
+                            </div>
+                            
+                            <div class="mt-auto pt-8 border-t border-white/10">
+                                ${variantHTML}
+                                <button id="add-btn" onclick="addToCartFromPage()" class="beams-cta w-full text-center flex justify-center items-center h-14 mt-6">
+                                    Initializing System...
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Initialize selection state
+                setTimeout(updateVariantSelection, 50);
+            } catch (err) {
+                console.error(err);
+                appRoot.innerHTML = '<div class="text-center py-32 font-mono text-white/50">Asset not found.</div>';
+            }
+        }
+
+        async function renderAbout() {
+            appRoot.innerHTML = `
+                <div class="max-w-7xl mx-auto px-6 py-20 border-b border-white/10 relative overflow-hidden min-h-[70vh] flex flex-col justify-center">
+                    <img src="../Assets/LogoNoText_White.png" class="absolute -right-32 top-1/2 -translate-y-1/2 w-[800px] opacity-[0.03] pointer-events-none">
+                    
+                    <div class="relative z-10 max-w-2xl">
+                        <p class="text-[0.7rem] tracking-[0.25em] uppercase text-white/40 mb-6 font-mono font-bold">About Us</p>
+                        <h1 class="text-4xl md:text-6xl text-white tracking-tighter font-syncopate uppercase mb-10 leading-none">Define Your Vector.</h1>
+                        
+                        <div class="font-inter text-white/60 leading-relaxed space-y-6 text-lg">
+                            <p>Aviation isn't just a hobby; it’s a perspective.</p>
+                            <p>Delta V was born from an obsession with the sleek lines, the raw power, and the timeless legacy of flight. We noticed a gap in the market: most aviation apparel was either too cheesy or lacked the quality that pilots and enthusiasts actually wanted to wear. We decided to change that.</p>
+                            <p>Our name, Δv, represents a change in velocity. In physics, it’s the impulse required to move from one state to another. For us, it represents the drive to move aviation style forward—stripping away the clutter to deliver clean, minimalist, and high-quality gear.</p>
+                            <p>Designed for the hangar. Built for the street.</p>
+                            <p>We don't do fast fashion. Our pieces are designed for those who appreciate the subtle details of a classic airframe or the technical beauty of a modern jet. We bridge the gap between aviation history and modern streetwear, creating garments that look as good on the ramp as they do in the city.</p>
+                        </div>
+                        
+                        <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-white/10 pt-10">
+                            <div>
+                                <h3 class="font-syncopate text-white uppercase text-sm mb-3">Premium Textiles</h3>
+                                <p class="font-inter text-xs text-white/50">We use premium, high-density fabrics that provide a structured fit and long-term durability.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-syncopate text-white uppercase text-sm mb-3">Detailed Artistry</h3>
+                                <p class="font-inter text-xs text-white/50">Every graphic is custom-built from the ground up, inspired by original blueprints, telemetry data, and iconic aircraft silhouettes.</p>
+                            </div>
+                            <div>
+                                <h3 class="font-syncopate text-white uppercase text-sm mb-3">Purposeful Design</h3>
+                                <p class="font-inter text-xs text-white/50">No unnecessary bulk. Just refined essentials for those who live life at a different altitude.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Interaction Logic ---
+        window.updateVariantSelection = function() {
+            if (!window.currentProductVariants) return;
+            
+            let variant = window.currentProductVariants.find(v => {
+                let matchColor = window.selectedColor ? (v.attributes.color && v.attributes.color.name === window.selectedColor) : true;
+                let matchSize = window.selectedSize ? (v.attributes.size && v.attributes.size.name === window.selectedSize) : true;
+                return matchColor && matchSize;
+            });
+            
+            // Fallback if the specific color+size combo doesn't exist, just grab one with the right color
+            if (!variant && window.selectedColor) {
+                variant = window.currentProductVariants.find(v => v.attributes.color && v.attributes.color.name === window.selectedColor);
+            }
+            if (!variant) variant = window.currentProductVariants[0];
+
+            // Update Gallery Images (on color/size change)
+            const galleryWrapper = document.getElementById('gallery-wrapper');
+            if (galleryWrapper && window.currentProduct) {
+                let variantImages = (variant && variant.images && variant.images.length > 0) ? variant.images : window.currentProduct.images;
+                if (!variantImages) variantImages = [];
+                let imagesHTML = '';
+                variantImages.forEach(img => {
+                    imagesHTML += `
+                        <div class="snap-center flex-shrink-0 w-full h-full flex items-center justify-center p-8 bg-neutral-900">
+                            <img src="${img.url}" class="max-w-full max-h-full object-contain opacity-95 drop-shadow-2xl product-img">
+                        </div>
+                    `;
+                });
+                
+                let controlsHTML = '';
+                if (variantImages.length > 1) {
+                    controlsHTML = `
+                        <button onclick="document.getElementById('product-gallery').scrollBy({left:-document.getElementById('product-gallery').offsetWidth, behavior:'smooth'})" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-black/40 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 border border-white/10 z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M14 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button onclick="document.getElementById('product-gallery').scrollBy({left:document.getElementById('product-gallery').offsetWidth, behavior:'smooth'})" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-black/40 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 border border-white/10 z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><path d="M10 18l6-6-6-6"/></svg>
+                        </button>
+                    `;
+                }
+                
+                galleryWrapper.innerHTML = `
+                    <div id="product-gallery" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scroll">
+                        ${imagesHTML}
+                    </div>
+                    ${controlsHTML}
+                `;
+            }
+
+            const btn = document.getElementById('add-btn');
+            if (btn) {
+                // Fourthwall stock: type=UNLIMITED means always in stock; type=IN_STOCK; type=OUT_OF_STOCK
+                const inStock = variant && variant.stock && variant.stock.type !== 'OUT_OF_STOCK';
+                if (inStock) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Add To Manifest';
+                    btn.dataset.variantId = variant.id;
+                    const priceEl = document.getElementById('price-display');
+                    if (priceEl && variant.unitPrice) priceEl.innerText = '$' + variant.unitPrice.value.toFixed(2);
+                } else {
+                    btn.disabled = true;
+                    btn.innerHTML = 'Out of Stock';
+                    btn.dataset.variantId = '';
+                }
+            }
+        };
+
+        window.selectColor = function(btn, color) {
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('!border-white', '!scale-110'));
+            btn.classList.add('!border-white', '!scale-110');
+            window.selectedColor = color;
+            window.updateVariantSelection();
+        };
+
+        window.selectSize = function(btn, size) {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('!border-white', '!bg-white/10', '!text-white'));
+            btn.classList.add('!border-white', '!bg-white/10', '!text-white');
+            window.selectedSize = size;
+            window.updateVariantSelection();
+        };
+
+        // --- Mobile Nav ---
+        function toggleMobileNav() {
+            const nav = document.getElementById('mobile-nav');
+            const top = document.getElementById('ham-top');
+            const mid = document.getElementById('ham-mid');
+            const bot = document.getElementById('ham-bot');
+            mobileNavOpen = !mobileNavOpen;
+            if (mobileNavOpen) {
+                nav.classList.remove('nav-hidden');
+                nav.classList.add('nav-visible');
+                top.style.transform = 'translateY(6px) rotate(45deg)';
+                mid.style.opacity = '0';
+                bot.style.transform = 'translateY(-6px) rotate(-45deg)';
+                document.body.style.overflow = 'hidden';
+            } else {
+                nav.classList.remove('nav-visible');
+                nav.classList.add('nav-hidden');
+                top.style.transform = '';
+                mid.style.opacity = '';
+                bot.style.transform = '';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // --- Size Guide Modal ---
+        function openSizeGuide() {
+            const modal = document.getElementById('size-modal');
+            modal.classList.remove('modal-hidden');
+            modal.classList.add('modal-visible');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSizeGuide() {
+            const modal = document.getElementById('size-modal');
+            modal.classList.remove('modal-visible');
+            modal.classList.add('modal-hidden');
+            document.body.style.overflow = '';
+        }
+
+        // --- Cart API Logic ---
+        async function initCart() {
+            if (cartId) {
+                try {
+                    const res = await fetch(`${API_BASE}/carts/${cartId}?storefront_token=${STOREFRONT_TOKEN}`);
+                    if (res.ok) {
+                        cartData = await res.json();
+                        updateCartUI();
+                    } else {
+                        cartId = null;
+                        localStorage.removeItem('cartId');
+                    }
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        async function ensureCart() {
+            if (cartId) return cartId;
+            const res = await fetch(`${API_BASE}/carts?storefront_token=${STOREFRONT_TOKEN}`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: [] })
+            });
+            const cart = await res.json();
+            cartId = cart.id;
+            localStorage.setItem("cartId", cartId);
+            return cartId;
+        }
+
+        async function addToCartFromPage() {
+            const btn = document.getElementById('add-btn');
+            const variantId = btn && btn.dataset.variantId;
+            if (!variantId) return;
+            
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-top-color:#000;"></div>';
+            btn.disabled = true;
+
+            try {
+                const id = await ensureCart();
+                const addRes = await fetch(`${API_BASE}/carts/${id}/add?storefront_token=${STOREFRONT_TOKEN}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: [{ variantId, quantity: 1 }] })
+                });
+                
+                if (!addRes.ok) throw new Error("Failed to add");
+                cartData = await addRes.json(); // /add returns full cart
+                updateCartUI();
+                
+                btn.innerHTML = '&#10003; Added';
+                setTimeout(() => { toggleCart(); btn.innerHTML = originalText; btn.disabled = false; }, 900);
+            } catch (err) {
+                console.error(err);
+                btn.innerHTML = 'Error — Retry';
+                setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
+            }
+        }
+
+        async function removeFromCart(variantId, btnElement) {
+            if (!cartId) return;
+            btnElement.disabled = true;
+            btnElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+            
+            try {
+                const remRes = await fetch(`${API_BASE}/carts/${cartId}/remove?storefront_token=${STOREFRONT_TOKEN}`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: [{ variantId }] })
+                });
+                if (!remRes.ok) throw new Error("Failed to remove");
+                cartData = await remRes.json(); // /remove returns full cart
+                updateCartUI();
+            } catch (err) {
+                console.error("Remove failed", err);
+                updateCartUI(); // re-render to restore buttons
+            }
+        }
+
+        function updateCartUI() {
+            const items = cartData && cartData.items ? cartData.items : [];
+            let totalQty = 0;
+            let totalValue = 0;
+            let itemsHTML = '';
+
+            if (items.length === 0) {
+                itemsHTML = '<div class="text-white/30 uppercase tracking-widest text-center mt-10">Manifest Empty</div>';
+                cartSubtotal.innerText = '$0.00';
+                checkoutBtn.disabled = true;
+                cartCount.style.opacity = '0';
+            } else {
+                items.forEach(item => {
+                    totalQty += item.quantity;
+                    const priceVal = item.variant && item.variant.unitPrice ? item.variant.unitPrice.value : 0;
+                    const price = priceVal * item.quantity;
+                    totalValue += price;
+                    
+                    const fullName = item.variant ? item.variant.name : 'Unknown Asset';
+                    const nameParts = fullName.split(' - ');
+                    const title = nameParts[0];
+                    const variantName = nameParts.length > 1 ? nameParts[1] : '';
+                    const imgUrl = (item.variant && item.variant.images && item.variant.images.length > 0) ? item.variant.images[0].url : '';
+                    
+                    itemsHTML += `
+                        <div class="flex gap-4 border-b border-white/10 pb-4 relative group/item">
+                            <button onclick="removeFromCart('${item.variant.id}', this)" class="absolute top-0 right-0 p-1 text-white/30 hover:text-white opacity-0 group-hover/item:opacity-100 transition-opacity" title="Remove Item">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                            </button>
+                            <div class="w-16 h-20 bg-black overflow-hidden flex-shrink-0 border border-white/10 flex items-center justify-center">
+                                ${imgUrl ? `<img src="${imgUrl}" class="w-full h-full object-cover opacity-80" alt="${title}">` : ''}
+                            </div>
+                            <div class="flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-white font-syncopate uppercase text-xs line-clamp-1">${title}</h4>
+                                    <p class="text-white/50 text-[10px] uppercase mt-1">QTY: ${item.quantity} ${variantName ? `· ${variantName}` : ''}</p>
+                                </div>
+                                <div class="text-white/80">$${price.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                cartSubtotal.innerText = `$${totalValue.toFixed(2)}`;
+                checkoutBtn.disabled = false;
+                
+                cartCount.innerText = totalQty;
+                cartCount.style.opacity = '1';
+            }
+            
+            cartItemsContainer.innerHTML = itemsHTML;
+        }
+
+        function toggleCart() {
+            const isClosed = cartDrawer.classList.contains('cart-closed');
+            if (isClosed) {
+                cartDrawer.classList.remove('cart-closed');
+                cartDrawer.classList.add('cart-open');
+                cartOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                cartOverlay.classList.add('opacity-100', 'pointer-events-auto');
+            } else {
+                cartDrawer.classList.remove('cart-open');
+                cartDrawer.classList.add('cart-closed');
+                cartOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+                cartOverlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function checkout() {
+            if (!cartId) return;
+            window.location.href = `https://${CHECKOUT_DOMAIN}/checkout?cartId=${cartId}`;
+        }
+
+        // Hero Canvas Animation logic
+        function initHeroCanvas() {
+            const canvas = document.getElementById('heroCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            const dots = [];
+            
+            function resize() {
+                const parent = canvas.parentElement;
+                width = canvas.width = parent.clientWidth;
+                height = canvas.height = parent.clientHeight;
+            }
+            
+            window.addEventListener('resize', resize);
+            resize();
+            
+            for (let i = 0; i < 200; i++) {
+                dots.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2 + 0.5,
+                    speedY: Math.random() * 0.4 + 0.08
+                });
+            }
+            
+            function animate() {
+                if (!document.getElementById('heroCanvas')) return; // stop if unmounted
+                ctx.clearRect(0, 0, width, height);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                
+                dots.forEach(dot => {
+                    ctx.beginPath();
+                    ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    dot.y -= dot.speedY;
+                    if (dot.y < 0) {
+                        dot.y = height;
+                        dot.x = Math.random() * width;
+                    }
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
