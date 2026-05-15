@@ -6,6 +6,7 @@ import CartDrawer from "@/components/CartDrawer";
 import CartInitializer from "@/components/CartInitializer";
 import Toast from "@/components/Toast";
 import SmoothScroll from "@/components/SmoothScroll";
+import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
   title: {
