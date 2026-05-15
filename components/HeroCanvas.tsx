@@ -88,15 +88,11 @@ function Starfield() {
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={positions.length / 3}
-            array={positions}
-            itemSize={3}
+            args={[positions, 3]}
           />
           <bufferAttribute
             attach="attributes-color"
-            count={opacities.length / 3}
-            array={opacities}
-            itemSize={3}
+            args={[opacities, 3]}
           />
         </bufferGeometry>
         <pointsMaterial
