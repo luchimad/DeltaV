@@ -58,36 +58,20 @@ export default function ProductGallery({
         <>
           <button
             onClick={() => scrollGallery(-1)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-black/40 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 border border-white/10 z-10"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-12 flex items-center justify-center bg-black/40 hover:bg-white/10 text-white/50 hover:text-white backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 border border-white/20 rounded-sm z-10"
             aria-label="Previous image"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="square"
-            >
-              <path d="M14 18l-6-6 6-6" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+              <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
           <button
             onClick={() => scrollGallery(1)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-black/40 hover:bg-white text-white hover:text-black rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 border border-white/10 z-10"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-12 flex items-center justify-center bg-black/40 hover:bg-white/10 text-white/50 hover:text-white backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 border border-white/20 rounded-sm z-10"
             aria-label="Next image"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="square"
-            >
-              <path d="M10 18l6-6-6-6" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
+              <path d="M9 18l6-6-6-6" />
             </svg>
           </button>
         </>

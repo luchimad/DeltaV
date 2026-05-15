@@ -4,6 +4,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import CartInitializer from "@/components/CartInitializer";
+import Toast from "@/components/Toast";
+import SmoothScroll from "@/components/SmoothScroll";
 
 export const metadata: Metadata = {
   title: {
@@ -60,7 +62,10 @@ export default function RootLayout({
       <body className="bg-black text-white antialiased min-h-screen flex flex-col">
         <CartInitializer />
         <Header />
-        <main className="flex-1 mt-16">{children}</main>
+        <Toast />
+        <SmoothScroll>
+          <main className="flex-1 mt-16">{children}</main>
+        </SmoothScroll>
         <Footer />
         <CartDrawer />
       </body>

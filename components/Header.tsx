@@ -68,7 +68,7 @@ export default function Header() {
               aria-label="Open cart"
             >
               <span className="font-mono text-[0.65rem] tracking-widest hidden md:block">
-                MANIFEST
+                LIST
               </span>
               <svg
                 width="18"

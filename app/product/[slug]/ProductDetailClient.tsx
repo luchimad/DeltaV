@@ -84,6 +84,8 @@ export default function ProductDetailClient({
     return product.images ?? [];
   }, [selectedVariant, product.images]);
 
+  const showToast = useCartStore((s) => s.showToast);
+
   // ── Add to cart handler ────────────────────────────────────────────────
   const handleAddToCart = useCallback(async () => {
     if (!selectedVariant || !inStock) return;
@@ -92,15 +94,15 @@ export default function ProductDetailClient({
     try {
       await addItem(selectedVariant.id);
       setAddState("added");
+      showToast(`✓ VECTOR LOCKED — ${product.name} added`);
       setTimeout(() => {
-        openCart();
         setAddState("idle");
-      }, 900);
+      }, 2000);
     } catch {
       setAddState("error");
       setTimeout(() => setAddState("idle"), 2000);
     }
-  }, [selectedVariant, inStock, addItem, openCart]);
+  }, [selectedVariant, inStock, addItem, showToast, product.name]);
 
   // ── Button label ───────────────────────────────────────────────────────
   function renderButtonContent() {
@@ -112,7 +114,7 @@ export default function ProductDetailClient({
       case "error":
         return "Error — Retry";
       default:
-        return inStock ? "Add To Manifest" : "Out of Stock";
+        return inStock ? "Add To List" : "Out of Stock";
     }
   }
 
