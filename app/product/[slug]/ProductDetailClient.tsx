@@ -118,6 +118,37 @@ export default function ProductDetailClient({
     }
   }
 
+  // ── Product Type & Specs ────────────────────────────────────────────────
+  const productType = useMemo(() => {
+    const name = product.name.toLowerCase();
+    if (name.includes("sweatshirt") || name.includes("hoodie") || name.includes("crewneck")) return "sweatshirt";
+    return "tshirt";
+  }, [product.name]);
+
+  function renderSpecs() {
+    if (productType === "sweatshirt") {
+      return (
+        <ul className="list-disc pl-4 space-y-1 text-white/50 text-xs mt-6 font-mono tracking-wide leading-relaxed">
+          <li>80% organic combed ring-spun cotton, 20% recycled polyester</li>
+          <li>Heavyweight fabric (10.3 oz)</li>
+          <li>Relaxed fit, Set-in sleeves</li>
+          <li>Double-needle topstitch at the hem, cuffs, and armholes</li>
+          <li>GOTS & OEKO-TEX Standard 100 certified</li>
+          <li>PETA-Approved Vegan</li>
+        </ul>
+      );
+    }
+    return (
+      <ul className="list-disc pl-4 space-y-1 text-white/50 text-xs mt-6 font-mono tracking-wide leading-relaxed">
+        <li>100% combed cotton (Marles color 85% cotton / 15% viscose)</li>
+        <li>Heavyweight fabric (5.3 oz)</li>
+        <li>Yarn diameter: 28 singles, Pre-shrunk</li>
+        <li>Regular fit, Crew neck, Side-seamed</li>
+        <li>Double-needle topstitch on sleeves and hem</li>
+      </ul>
+    );
+  }
+
   return (
     <>
       <div className="max-w-7xl mx-auto border-b border-l border-r border-white/10 flex flex-col md:flex-row min-h-[70vh]">
@@ -147,10 +178,13 @@ export default function ProductDetailClient({
           </div>
 
           {/* Description */}
-          <div
-            className="product-description mb-10"
-            dangerouslySetInnerHTML={{ __html: product.description ?? "" }}
-          />
+          <div className="mb-10">
+            <div
+              className="product-description"
+              dangerouslySetInnerHTML={{ __html: product.description ?? "" }}
+            />
+            {renderSpecs()}
+          </div>
 
           {/* Variants & Add to Cart */}
           <div className="mt-auto pt-8 border-t border-white/10">
@@ -181,6 +215,7 @@ export default function ProductDetailClient({
       <SizeGuideModal
         isOpen={sizeGuideOpen}
         onClose={() => setSizeGuideOpen(false)}
+        productType={productType}
       />
     </>
   );
