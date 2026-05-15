@@ -19,10 +19,9 @@ export default function Footer() {
               className="h-8 w-auto object-contain"
             />
           </Link>
-          <p className="text-white/50 text-sm leading-relaxed">
-            Aerospace and defense apparel engineered for the trajectory of the
-            high-end aviator. Ultimate heavyweights, precision bombers, absolute
-            stealth execution.
+          <p className="text-white/50 text-sm leading-relaxed mt-2">
+            Change your velocity.<br />
+            Define your vector.
           </p>
           <p className="text-[0.65rem] tracking-[0.2em] uppercase text-white/40 font-mono font-bold">
             Vector Log: Active
@@ -33,7 +32,7 @@ export default function Footer() {
         <div className="pt-8 md:pt-0">
           <div className="flex flex-col gap-y-3 font-mono">
             <p className="mb-2 text-[0.65rem] tracking-[0.2em] uppercase text-white/40 font-bold">
-              Systems
+              Vectors
             </p>
             <Link
               href="/collection/aero"
@@ -60,7 +59,7 @@ export default function Footer() {
       {/* Copyright Bar */}
       <div className="bg-white/5 border-t border-white/10 py-6 mt-8">
         <p className="text-center text-[0.65rem] text-white/40 tracking-[0.15em] uppercase font-mono font-bold">
-          © {new Date().getFullYear()} DELTA V AEROSPACE LLC
+          © 2026 DELTA V CLOTHING CO.
         </p>
       </div>
     </footer>
