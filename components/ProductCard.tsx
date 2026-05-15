@@ -43,9 +43,9 @@ export default function ProductCard({ product, className = "", index = 0 }: Prod
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.6, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
       className={`glass-card group ${className}`}
       style={{ aspectRatio: "3/4" }}
     >
@@ -72,7 +72,7 @@ export default function ProductCard({ product, className = "", index = 0 }: Prod
       <button
         onClick={handleQuickAdd}
         disabled={adding}
-        className="absolute bottom-[4.5rem] right-4 w-10 h-10 bg-black/40 hover:bg-white/10 text-white/50 hover:text-white backdrop-blur-md border border-white/20 rounded-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-10 translate-y-2 group-hover:translate-y-0"
+        className="absolute bottom-[4.5rem] right-4 w-12 h-12 bg-black/60 hover:bg-white/20 text-white/70 hover:text-white backdrop-blur-md border border-white/30 rounded-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-10 translate-y-4 group-hover:translate-y-0 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
         aria-label="Quick add"
       >
         {adding ? (
