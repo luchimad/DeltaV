@@ -10,9 +10,8 @@ export default function CustomCursor() {
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  const springConfig = { damping: 25, stiffness: 300, mass: 0.5 };
-  const cursorX = useSpring(mouseX, springConfig);
-  const cursorY = useSpring(mouseY, springConfig);
+  const cursorX = mouseX;
+  const cursorY = mouseY;
 
   useEffect(() => {
     // Only activate on devices with a fine pointer (desktop)
