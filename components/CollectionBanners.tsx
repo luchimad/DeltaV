@@ -31,7 +31,7 @@ function CollectionBanner({
       <div className="relative z-10 w-full flex justify-between items-end">
         <div>
           <p className="font-mono text-[0.65rem] tracking-[0.2em] text-white/50 mb-2 uppercase">
-            Core Domain
+            Domain
           </p>
           <h3 className="font-syncopate text-3xl md:text-4xl uppercase text-white">
             {title}

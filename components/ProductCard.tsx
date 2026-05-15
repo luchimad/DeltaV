@@ -36,7 +36,7 @@ export default function ProductCard({ product, className = "", index = 0 }: Prod
   // Map to glare position (percentages for background position)
   const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ["100%", "0%"]);
   const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ["100%", "0%"]);
-  const glareBackground = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.15) 0%, transparent 60%)`;
+  const glareBackground = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.08) 0%, transparent 100%)`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;

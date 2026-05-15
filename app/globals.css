@@ -249,3 +249,13 @@ body {
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
+
+/* ─── Custom Cursor Hide Default ──────────────────────────────────────────── */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  a, button, [role="button"] {
+    cursor: none !important;
+  }
+}

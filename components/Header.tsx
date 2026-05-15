@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/stores/cart-store";
 import MobileNav from "./MobileNav";
+import MagneticButton from "./MagneticButton";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -23,74 +24,84 @@ export default function Header() {
       <header className="fixed top-0 inset-x-0 z-40 bg-black/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
         <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center hover:opacity-70 transition-opacity"
-          >
-            <Image
-              src="/assets/logo-notext-white.png"
-              alt="Delta V Logo"
-              width={24}
-              height={24}
-              className="h-6 w-auto object-contain"
-              priority
-            />
-          </Link>
+          <MagneticButton strength={0.2}>
+            <Link
+              href="/"
+              className="flex items-center hover:opacity-70 transition-opacity"
+            >
+              <Image
+                src="/assets/logo-notext-white.png"
+                alt="Delta V Logo"
+                width={24}
+                height={24}
+                className="h-6 w-auto object-contain"
+                priority
+              />
+            </Link>
+          </MagneticButton>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8 font-mono text-[0.65rem] tracking-[0.1em] uppercase font-semibold">
-            <Link
-              href="/collection/aero"
-              className="nav-link py-2 text-white/80 hover:text-white"
-            >
-              Aero
-            </Link>
-            <Link
-              href="/collection/signature"
-              className="nav-link py-2 text-white/80 hover:text-white"
-            >
-              Signature
-            </Link>
-            <Link
-              href="/about"
-              className="nav-link py-2 text-white/80 hover:text-white"
-            >
-              About
-            </Link>
+            <MagneticButton strength={0.3}>
+              <Link
+                href="/collection/aero"
+                className="nav-link py-2 text-white/80 hover:text-white"
+              >
+                Aero
+              </Link>
+            </MagneticButton>
+            <MagneticButton strength={0.3}>
+              <Link
+                href="/collection/signature"
+                className="nav-link py-2 text-white/80 hover:text-white"
+              >
+                Signature
+              </Link>
+            </MagneticButton>
+            <MagneticButton strength={0.3}>
+              <Link
+                href="/about"
+                className="nav-link py-2 text-white/80 hover:text-white"
+              >
+                About
+              </Link>
+            </MagneticButton>
           </div>
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
             {/* Cart Button — Tactical Manifest Icon */}
-            <button
-              onClick={toggleCart}
-              className="relative text-white/80 hover:text-white transition-colors group flex items-center gap-2"
-              aria-label="Open cart"
-            >
-              <span className="font-mono text-[0.65rem] tracking-widest hidden md:block">
-                LIST
-              </span>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                xmlns="http://www.w3.org/2000/svg"
+            <MagneticButton strength={0.3}>
+              <button
+                onClick={toggleCart}
+                className="relative text-white/80 hover:text-white transition-colors group flex items-center gap-2"
+                aria-label="Open cart"
               >
-                <rect x="3" y="2" width="12" height="15" rx="1" />
-                <path d="M6.5 1v2.5M11.5 1v2.5" />
-                <path d="M6 8h6M6 11h4" />
-              </svg>
-              <span
-                className={`absolute -top-2 -right-2 bg-white text-black text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center transition-opacity ${
-                  qty > 0 ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                {qty}
-              </span>
-            </button>
+                <span className="font-mono text-[0.65rem] tracking-widest hidden md:block">
+                  LIST
+                </span>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect x="3" y="2" width="12" height="15" rx="1" />
+                  <path d="M6.5 1v2.5M11.5 1v2.5" />
+                  <path d="M6 8h6M6 11h4" />
+                </svg>
+                <span
+                  className={`absolute -top-2 -right-2 bg-white text-black text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center transition-opacity ${
+                    qty > 0 ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  {qty}
+                </span>
+              </button>
+            </MagneticButton>
 
             {/* Mobile Hamburger */}
             <button

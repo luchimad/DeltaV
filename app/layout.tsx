@@ -60,6 +60,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white antialiased min-h-screen flex flex-col">
+        <CustomCursor />
         <CartInitializer />
         <Header />
         <Toast />
