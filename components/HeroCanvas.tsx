@@ -1,109 +1,103 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState } from "react";
+import { useRef, useMemo, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+// Generate the star texture outside of React's render cycle
+let _starTexture: THREE.CanvasTexture | null = null;
+function getStarTexture(): THREE.CanvasTexture {
+  if (_starTexture) return _starTexture;
+  const canvas = document.createElement("canvas");
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext("2d")!;
+  ctx.clearRect(0, 0, 32, 32);
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.moveTo(16, 0);
+  ctx.quadraticCurveTo(16, 16, 32, 16);
+  ctx.quadraticCurveTo(16, 16, 16, 32);
+  ctx.quadraticCurveTo(16, 16, 0, 16);
+  ctx.quadraticCurveTo(16, 16, 16, 0);
+  ctx.fill();
+  _starTexture = new THREE.CanvasTexture(canvas);
+  return _starTexture;
+}
+
 function Starfield() {
-  const count = 400;
+  const count = 350;
   const groupRef = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
   const targetRot = useRef({ x: 0, y: 0 });
 
-  // Generate random positions, velocities, and opacities
-  const [positions, velocities, opacities] = useMemo(() => {
+  // Generate random positions, velocities, and colors (one-time)
+  const { positions, velocities, colors } = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const vel = new Float32Array(count);
-    const op = new Float32Array(count * 3);
-    
+    const col = new Float32Array(count * 3);
+
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 25; // x spread
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 20; // y spread
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 15 - 5; // z spread
-      vel[i] = Math.random() * 0.015 + 0.005; // speed going up
+      pos[i * 3] = (Math.random() - 0.5) * 25;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 15 - 5;
+      vel[i] = Math.random() * 0.015 + 0.005;
       const intensity = Math.random() * 0.6 + 0.2;
-      op[i * 3] = intensity; // R
-      op[i * 3 + 1] = intensity; // G
-      op[i * 3 + 2] = intensity; // B
+      col[i * 3] = intensity;
+      col[i * 3 + 1] = intensity;
+      col[i * 3 + 2] = intensity;
     }
-    return [pos, vel, op];
+    return { positions: pos, velocities: vel, colors: col };
   }, []);
 
-  // Create a 4-point star texture for the particles
-  const starTexture = useMemo(() => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.fillStyle = "transparent";
-      ctx.fillRect(0, 0, 32, 32);
-      ctx.fillStyle = "white";
-      ctx.beginPath();
-      ctx.moveTo(16, 0);
-      ctx.quadraticCurveTo(16, 16, 32, 16);
-      ctx.quadraticCurveTo(16, 16, 16, 32);
-      ctx.quadraticCurveTo(16, 16, 0, 16);
-      ctx.quadraticCurveTo(16, 16, 16, 0);
-      ctx.fill();
-    }
-    return new THREE.CanvasTexture(canvas);
-  }, []);
+  const starTexture = useMemo(() => getStarTexture(), []);
 
-  // Track mouse globally since the canvas has pointer-events-none
+  // Track mouse globally
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      // Normalize to -1 to 1
       targetRot.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       targetRot.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
     };
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (!pointsRef.current || !groupRef.current) return;
-    
-    // Animate particles going up
-    const positionsAttr = pointsRef.current.geometry.attributes.position;
+
+    const posAttr = pointsRef.current.geometry.attributes.position;
+    const dtScaled = delta * 60;
     for (let i = 0; i < count; i++) {
-      let y = positionsAttr.getY(i);
-      y += velocities[i] * (delta * 60);
-      if (y > 10) y = -10; // loop back to bottom
-      positionsAttr.setY(i, y);
+      let y = posAttr.getY(i);
+      y += velocities[i] * dtScaled;
+      if (y > 10) y = -10;
+      posAttr.setY(i, y);
     }
-    positionsAttr.needsUpdate = true;
+    posAttr.needsUpdate = true;
 
-    // Slight and limited rotation mapped to cursor movement
-    const targetRotX = (targetRot.current.y * Math.PI) / 20; // inverted for natural feel
-    const targetRotY = (targetRot.current.x * Math.PI) / 20;
-
-    groupRef.current.rotation.x += (targetRotX - groupRef.current.rotation.x) * 0.05;
-    groupRef.current.rotation.y += (targetRotY - groupRef.current.rotation.y) * 0.05;
+    // Slight rotation from cursor
+    const tx = (targetRot.current.y * Math.PI) / 20;
+    const ty = (targetRot.current.x * Math.PI) / 20;
+    groupRef.current.rotation.x += (tx - groupRef.current.rotation.x) * 0.05;
+    groupRef.current.rotation.y += (ty - groupRef.current.rotation.y) * 0.05;
   });
 
   return (
     <group ref={groupRef}>
       <points ref={pointsRef}>
         <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[positions, 3]}
-          />
-          <bufferAttribute
-            attach="attributes-color"
-            args={[opacities, 3]}
-          />
+          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+          <bufferAttribute attach="attributes-color" args={[colors, 3]} />
         </bufferGeometry>
         <pointsMaterial
           map={starTexture}
           size={0.12}
-          sizeAttenuation={true}
-          transparent={true}
+          sizeAttenuation
+          transparent
           opacity={0.8}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
-          vertexColors={true}
+          vertexColors
         />
       </points>
     </group>
@@ -123,7 +117,15 @@ export default function HeroCanvas() {
     <div className="absolute inset-0 z-0 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
-        gl={{ alpha: true, antialias: true }}
+        gl={{
+          alpha: true,
+          antialias: false,
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: false,
+        }}
+        dpr={[1, 1.5]}
+        frameloop="always"
       >
         <Starfield />
       </Canvas>

@@ -94,7 +94,7 @@ export default function ProductCard({ product, className = "", index = 0 }: Prod
               alt={product.name}
               width={400}
               height={500}
-              className="w-full h-full object-contain drop-shadow-xl"
+              className="w-full h-full object-contain drop-shadow-lg"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-xs">
