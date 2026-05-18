@@ -1,10 +1,113 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState, useCallback } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useRef, useMemo, useEffect, useState, Component, type ReactNode } from "react";
 import * as THREE from "three";
 
-// Generate the star texture outside of React's render cycle
+// ─── WebGL Support Detection ─────────────────────────────────────────────────
+function isWebGLAvailable(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl2") ||
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl");
+    return gl instanceof WebGLRenderingContext || gl instanceof WebGL2RenderingContext;
+  } catch {
+    return false;
+  }
+}
+
+// ─── Error Boundary (catches Three.js crashes) ──────────────────────────────
+class CanvasErrorBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { fallback: ReactNode; children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+// ─── 2D Canvas Fallback (the original, battle-tested implementation) ────────
+function Canvas2DFallback() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let animId = 0;
+
+    const resize = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      width = canvas.width = parent.clientWidth;
+      height = canvas.height = parent.clientHeight;
+    };
+
+    resize();
+    window.addEventListener("resize", resize, { passive: true });
+
+    // Particles
+    const count = 300;
+    const particles: { x: number; y: number; r: number; o: number; vy: number }[] = [];
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 1.2 + 0.3,
+        o: Math.random() * 0.5 + 0.1,
+        vy: -(Math.random() * 0.4 + 0.1),
+      });
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height);
+      for (const p of particles) {
+        ctx.globalAlpha = p.o;
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        p.y += p.vy;
+        if (p.y < -5) {
+          p.y = height + 5;
+          p.x = Math.random() * width;
+        }
+      }
+      ctx.globalAlpha = 1;
+      animId = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full block"
+      style={{ position: "absolute", inset: 0 }}
+    />
+  );
+}
+
+// ─── WebGL 3D Starfield ─────────────────────────────────────────────────────
 let _starTexture: THREE.CanvasTexture | null = null;
 function getStarTexture(): THREE.CanvasTexture {
   if (_starTexture) return _starTexture;
@@ -25,18 +128,49 @@ function getStarTexture(): THREE.CanvasTexture {
   return _starTexture;
 }
 
-function Starfield() {
+function WebGLStarfield() {
+  // Lazy-import react-three-fiber to avoid loading it when WebGL is unavailable
+  const [R3FComponents, setR3FComponents] = useState<{
+    Canvas: any;
+    useFrame: any;
+  } | null>(null);
+
+  useEffect(() => {
+    import("@react-three/fiber").then((mod) => {
+      setR3FComponents({ Canvas: mod.Canvas, useFrame: mod.useFrame });
+    });
+  }, []);
+
+  if (!R3FComponents) return null;
+
+  return (
+    <R3FComponents.Canvas
+      camera={{ position: [0, 0, 5], fov: 75 }}
+      gl={{
+        alpha: true,
+        antialias: false,
+        powerPreference: "high-performance",
+        stencil: false,
+        depth: false,
+      }}
+      dpr={[1, 1.5]}
+      frameloop="always"
+    >
+      <StarfieldScene useFrame={R3FComponents.useFrame} />
+    </R3FComponents.Canvas>
+  );
+}
+
+function StarfieldScene({ useFrame }: { useFrame: any }) {
   const count = 350;
   const groupRef = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
   const targetRot = useRef({ x: 0, y: 0 });
 
-  // Generate random positions, velocities, and colors (one-time)
   const { positions, velocities, colors } = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const vel = new Float32Array(count);
     const col = new Float32Array(count * 3);
-
     for (let i = 0; i < count; i++) {
       pos[i * 3] = (Math.random() - 0.5) * 25;
       pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
@@ -52,7 +186,6 @@ function Starfield() {
 
   const starTexture = useMemo(() => getStarTexture(), []);
 
-  // Track mouse globally
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       targetRot.current.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -62,9 +195,8 @@ function Starfield() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  useFrame((_, delta) => {
+  useFrame((_: any, delta: number) => {
     if (!pointsRef.current || !groupRef.current) return;
-
     const posAttr = pointsRef.current.geometry.attributes.position;
     const dtScaled = delta * 60;
     for (let i = 0; i < count; i++) {
@@ -74,8 +206,6 @@ function Starfield() {
       posAttr.setY(i, y);
     }
     posAttr.needsUpdate = true;
-
-    // Slight rotation from cursor
     const tx = (targetRot.current.y * Math.PI) / 20;
     const ty = (targetRot.current.x * Math.PI) / 20;
     groupRef.current.rotation.x += (tx - groupRef.current.rotation.x) * 0.05;
@@ -104,31 +234,29 @@ function Starfield() {
   );
 }
 
+// ─── Main Export ─────────────────────────────────────────────────────────────
 export default function HeroCanvas() {
-  const [mounted, setMounted] = useState(false);
+  const [mode, setMode] = useState<"loading" | "webgl" | "2d">("loading");
 
   useEffect(() => {
-    setMounted(true);
+    setMode(isWebGLAvailable() ? "webgl" : "2d");
   }, []);
 
-  if (!mounted) return null;
+  if (mode === "loading") return null;
+
+  if (mode === "2d") {
+    return (
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <Canvas2DFallback />
+      </div>
+    );
+  }
 
   return (
     <div className="absolute inset-0 z-0 pointer-events-none">
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 75 }}
-        gl={{
-          alpha: true,
-          antialias: false,
-          powerPreference: "high-performance",
-          stencil: false,
-          depth: false,
-        }}
-        dpr={[1, 1.5]}
-        frameloop="always"
-      >
-        <Starfield />
-      </Canvas>
+      <CanvasErrorBoundary fallback={<Canvas2DFallback />}>
+        <WebGLStarfield />
+      </CanvasErrorBoundary>
     </div>
   );
 }
