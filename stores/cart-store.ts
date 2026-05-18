@@ -22,6 +22,11 @@ interface CartStore {
   closeCart: () => void;
   toggleCart: () => void;
 
+  // Toast actions
+  toastMessage: string | null;
+  showToast: (message: string) => void;
+  hideToast: () => void;
+
   // Cart data actions
   initCart: () => Promise<void>;
   addItem: (variantId: string) => Promise<void>;
@@ -61,6 +66,17 @@ export const useCartStore = create<CartStore>((set, get) => ({
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
   toggleCart: () => set((s) => ({ isOpen: !s.isOpen })),
+
+  // ── Toast ───────────────────────────────────────────────────────────────
+
+  toastMessage: null,
+  showToast: (message) => {
+    set({ toastMessage: message });
+    setTimeout(() => {
+      set((s) => (s.toastMessage === message ? { toastMessage: null } : s));
+    }, 3000);
+  },
+  hideToast: () => set({ toastMessage: null }),
 
   // ── Init ────────────────────────────────────────────────────────────────
 

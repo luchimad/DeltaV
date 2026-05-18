@@ -55,7 +55,7 @@ export default function CartDrawer() {
             {/* Header */}
             <div className="p-6 border-b border-white/10 flex justify-between items-center">
               <h2 className="font-syncopate uppercase text-lg tracking-wider">
-                Operational Manifest
+                Operational List
               </h2>
               <button
                 onClick={closeCart}
@@ -79,7 +79,7 @@ export default function CartDrawer() {
             <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 font-mono text-sm">
               {items.length === 0 ? (
                 <div className="text-white/30 uppercase tracking-widest text-center mt-10">
-                  Manifest Empty
+                  List Empty
                 </div>
               ) : (
                 items.map((item) => {

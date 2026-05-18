@@ -25,7 +25,7 @@ export default function ProductCarousel({ products }: ProductCarouselProps) {
               Active Deployment
             </p>
             <h2 className="text-2xl md:text-3xl text-white tracking-tight font-syncopate uppercase">
-              All Systems
+              All Items
             </h2>
           </div>
           <div className="hidden sm:flex gap-4">

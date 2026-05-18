@@ -5,19 +5,32 @@ import { AnimatePresence, motion } from "framer-motion";
 interface SizeGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
+  productType: "tshirt" | "sweatshirt";
 }
 
-const sizeData = [
-  { size: "XS", chest: "33–35", length: "27", shoulder: "16" },
-  { size: "S", chest: "35–37", length: "28", shoulder: "17" },
-  { size: "M", chest: "38–40", length: "29", shoulder: "18" },
-  { size: "L", chest: "41–43", length: "30", shoulder: "19" },
-  { size: "XL", chest: "44–46", length: "31", shoulder: "20" },
-  { size: "2XL", chest: "47–49", length: "32", shoulder: "21" },
-  { size: "3XL", chest: "50–52", length: "33", shoulder: "22" },
+const tshirtData = [
+  { size: "S", length: "71", width: "47" },
+  { size: "M", length: "75", width: "52" },
+  { size: "L", length: "79", width: "57" },
+  { size: "XL", length: "82", width: "61" },
+  { size: "2XL", length: "84", width: "64" },
+  { size: "3XL", length: "85", width: "68" },
 ];
 
-export default function SizeGuideModal({ isOpen, onClose }: SizeGuideModalProps) {
+const sweatshirtData = [
+  { size: "S", length: "71", width: "55", sleeve: "64" },
+  { size: "M", length: "73", width: "59", sleeve: "66" },
+  { size: "L", length: "75", width: "63", sleeve: "66" },
+  { size: "XL", length: "78", width: "68", sleeve: "67" },
+  { size: "2XL", length: "80", width: "73", sleeve: "68" },
+];
+
+const toIn = (cm: string) => (Number(cm) * 0.393701).toFixed(1);
+
+export default function SizeGuideModal({ isOpen, onClose, productType }: SizeGuideModalProps) {
+  const isSweatshirt = productType === "sweatshirt";
+  const data = isSweatshirt ? sweatshirtData : tshirtData;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -49,7 +62,7 @@ export default function SizeGuideModal({ isOpen, onClose }: SizeGuideModalProps)
                   Reference Document
                 </p>
                 <h3 className="font-syncopate uppercase text-white text-lg tracking-wider">
-                  Size Matrix
+                  Size Matrix ({isSweatshirt ? "Sweatshirt" : "T-Shirt"})
                 </h3>
               </div>
               <button
@@ -78,23 +91,25 @@ export default function SizeGuideModal({ isOpen, onClose }: SizeGuideModalProps)
                     <th className="text-left py-3 pr-4 text-white/40 uppercase tracking-widest font-normal">
                       Size
                     </th>
-                    <th className="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal">
-                      Chest (in)
+                    <th className="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal whitespace-nowrap">
+                      Length
                     </th>
-                    <th className="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal">
-                      Length (in)
+                    <th className="text-center py-3 px-4 text-white/40 uppercase tracking-widest font-normal whitespace-nowrap">
+                      Width
                     </th>
-                    <th className="text-center py-3 pl-4 text-white/40 uppercase tracking-widest font-normal">
-                      Shoulder (in)
-                    </th>
+                    {isSweatshirt && (
+                      <th className="text-center py-3 pl-4 text-white/40 uppercase tracking-widest font-normal whitespace-nowrap">
+                        Sleeve
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {sizeData.map((row, i) => (
+                  {data.map((row, i) => (
                     <tr
                       key={row.size}
                       className={
-                        i < sizeData.length - 1
+                        i < data.length - 1
                           ? "border-b border-white/5"
                           : ""
                       }
@@ -102,18 +117,27 @@ export default function SizeGuideModal({ isOpen, onClose }: SizeGuideModalProps)
                       <td className="py-3 pr-4 text-white font-semibold">
                         {row.size}
                       </td>
-                      <td className="text-center py-3 px-4">{row.chest}</td>
-                      <td className="text-center py-3 px-4">{row.length}</td>
-                      <td className="text-center py-3 pl-4">{row.shoulder}</td>
+                      <td className="text-center py-3 px-4 whitespace-nowrap">
+                        {row.length}cm <span className="text-white/30 hidden sm:inline">({toIn(row.length)}")</span>
+                      </td>
+                      <td className="text-center py-3 px-4 whitespace-nowrap">
+                        {row.width}cm <span className="text-white/30 hidden sm:inline">({toIn(row.width)}")</span>
+                      </td>
+                      {isSweatshirt && (
+                        <td className="text-center py-3 pl-4 whitespace-nowrap">
+                          {(row as any).sleeve}cm <span className="text-white/30 hidden sm:inline">({toIn((row as any).sleeve)}")</span>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <p className="mt-6 text-[0.6rem] font-mono text-white/30 uppercase tracking-widest">
-              All measurements in inches. Products are true to size. Size up for
-              oversized fit.
+            <p className="mt-6 text-[0.6rem] font-mono text-white/40 uppercase tracking-widest leading-relaxed">
+              Measurements provided by suppliers. May vary by up to 2" (5cm).<br />
+              <span className="text-white/70 font-semibold">Pro tip:</span> Measure a product you own and compare.
+              {isSweatshirt && " Runs small. For a perfect fit, we recommend sizing up."}
             </p>
           </motion.div>
         </motion.div>
