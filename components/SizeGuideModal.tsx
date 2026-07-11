@@ -8,7 +8,14 @@ interface SizeGuideModalProps {
   productType: "tshirt" | "sweatshirt";
 }
 
-const tshirtData = [
+interface SizeRow {
+  size: string;
+  length: string;
+  width: string;
+  sleeve?: string;
+}
+
+const tshirtData: SizeRow[] = [
   { size: "S", length: "71", width: "47" },
   { size: "M", length: "75", width: "52" },
   { size: "L", length: "79", width: "57" },
@@ -17,7 +24,7 @@ const tshirtData = [
   { size: "3XL", length: "85", width: "68" },
 ];
 
-const sweatshirtData = [
+const sweatshirtData: SizeRow[] = [
   { size: "S", length: "71", width: "55", sleeve: "64" },
   { size: "M", length: "73", width: "59", sleeve: "66" },
   { size: "L", length: "75", width: "63", sleeve: "66" },
@@ -118,14 +125,14 @@ export default function SizeGuideModal({ isOpen, onClose, productType }: SizeGui
                         {row.size}
                       </td>
                       <td className="text-center py-3 px-4 whitespace-nowrap">
-                        {row.length}cm <span className="text-white/30 hidden sm:inline">({toIn(row.length)}")</span>
+                        {row.length}cm <span className="text-white/30 hidden sm:inline">({toIn(row.length)}&quot;)</span>
                       </td>
                       <td className="text-center py-3 px-4 whitespace-nowrap">
-                        {row.width}cm <span className="text-white/30 hidden sm:inline">({toIn(row.width)}")</span>
+                        {row.width}cm <span className="text-white/30 hidden sm:inline">({toIn(row.width)}&quot;)</span>
                       </td>
                       {isSweatshirt && (
                         <td className="text-center py-3 pl-4 whitespace-nowrap">
-                          {(row as any).sleeve}cm <span className="text-white/30 hidden sm:inline">({toIn((row as any).sleeve)}")</span>
+                          {row.sleeve}cm <span className="text-white/30 hidden sm:inline">({toIn(row.sleeve ?? "0")}&quot;)</span>
                         </td>
                       )}
                     </tr>
@@ -135,7 +142,7 @@ export default function SizeGuideModal({ isOpen, onClose, productType }: SizeGui
             </div>
 
             <p className="mt-6 text-[0.6rem] font-mono text-white/40 uppercase tracking-widest leading-relaxed">
-              Measurements provided by suppliers. May vary by up to 2" (5cm).<br />
+              Measurements provided by suppliers. May vary by up to 2&quot; (5cm).<br />
               <span className="text-white/70 font-semibold">Pro tip:</span> Measure a product you own and compare.
               {isSweatshirt && " Runs small. For a perfect fit, we recommend sizing up."}
             </p>

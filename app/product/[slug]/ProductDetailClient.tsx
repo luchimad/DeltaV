@@ -18,7 +18,6 @@ export default function ProductDetailClient({
   product,
 }: ProductDetailClientProps) {
   const addItem = useCartStore((s) => s.addItem);
-  const openCart = useCartStore((s) => s.openCart);
 
   // ── Parse variants into unique colors & sizes ──────────────────────────
   const { colors, sizes } = useMemo(() => {

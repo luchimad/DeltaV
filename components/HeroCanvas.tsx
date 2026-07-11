@@ -2,6 +2,7 @@
 
 import { useRef, useMemo, useEffect, useState, Component, type ReactNode } from "react";
 import * as THREE from "three";
+import type { Canvas, useFrame as useFrameType } from "@react-three/fiber";
 
 // ─── WebGL Support Detection ─────────────────────────────────────────────────
 function isWebGLAvailable(): boolean {
@@ -128,11 +129,20 @@ function getStarTexture(): THREE.CanvasTexture {
   return _starTexture;
 }
 
+// Seedable LCG Pseudo-Random Number Generator (pure function to satisfy React compiler)
+function createPRNG(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) % 4294967296;
+    return s / 4294967296;
+  };
+}
+
 function WebGLStarfield() {
   // Lazy-import react-three-fiber to avoid loading it when WebGL is unavailable
   const [R3FComponents, setR3FComponents] = useState<{
-    Canvas: any;
-    useFrame: any;
+    Canvas: typeof Canvas;
+    useFrame: typeof useFrameType;
   } | null>(null);
 
   useEffect(() => {
@@ -161,22 +171,23 @@ function WebGLStarfield() {
   );
 }
 
-function StarfieldScene({ useFrame }: { useFrame: any }) {
+function StarfieldScene({ useFrame }: { useFrame: typeof useFrameType }) {
   const count = 350;
   const groupRef = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
   const targetRot = useRef({ x: 0, y: 0 });
 
   const { positions, velocities, colors } = useMemo(() => {
+    const random = createPRNG(42);
     const pos = new Float32Array(count * 3);
     const vel = new Float32Array(count);
     const col = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 25;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 15 - 5;
-      vel[i] = Math.random() * 0.015 + 0.005;
-      const intensity = Math.random() * 0.6 + 0.2;
+      pos[i * 3] = (random() - 0.5) * 25;
+      pos[i * 3 + 1] = (random() - 0.5) * 20;
+      pos[i * 3 + 2] = (random() - 0.5) * 15 - 5;
+      vel[i] = random() * 0.015 + 0.005;
+      const intensity = random() * 0.6 + 0.2;
       col[i * 3] = intensity;
       col[i * 3 + 1] = intensity;
       col[i * 3 + 2] = intensity;
@@ -195,7 +206,7 @@ function StarfieldScene({ useFrame }: { useFrame: any }) {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  useFrame((_: any, delta: number) => {
+  useFrame((_: unknown, delta: number) => {
     if (!pointsRef.current || !groupRef.current) return;
     const posAttr = pointsRef.current.geometry.attributes.position;
     const dtScaled = delta * 60;
@@ -239,7 +250,10 @@ export default function HeroCanvas() {
   const [mode, setMode] = useState<"loading" | "webgl" | "2d">("loading");
 
   useEffect(() => {
-    setMode(isWebGLAvailable() ? "webgl" : "2d");
+    const webglAvailable = isWebGLAvailable();
+    requestAnimationFrame(() => {
+      setMode(webglAvailable ? "webgl" : "2d");
+    });
   }, []);
 
   if (mode === "loading") return null;

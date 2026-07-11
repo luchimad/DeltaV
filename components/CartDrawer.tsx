@@ -27,7 +27,8 @@ export default function CartDrawer() {
 
   function handleCheckout() {
     if (!cartId) return;
-    window.location.href = getCheckoutUrl(cartId);
+    const currency = items[0]?.variant?.unitPrice?.currency;
+    window.location.href = getCheckoutUrl(cartId, currency);
   }
 
   return (
@@ -178,7 +179,7 @@ export default function CartDrawer() {
             <div className="p-6 border-t border-white/10 bg-black">
               <div className="flex justify-between font-mono text-sm uppercase text-white/70 mb-4">
                 <span>Subtotal</span>
-                <span>{formatPrice(total, "USD")}</span>
+                <span>{formatPrice(total, items[0]?.variant?.unitPrice?.currency ?? "USD")}</span>
               </div>
               <button
                 onClick={handleCheckout}

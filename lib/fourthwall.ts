@@ -91,6 +91,13 @@ export async function removeFromCart(
 
 // ─── Checkout ────────────────────────────────────────────────────────────────
 
-export function getCheckoutUrl(cartId: string): string {
-  return `https://${CHECKOUT_DOMAIN}/checkout?cartId=${cartId}`;
+export function getCheckoutUrl(cartId: string, currency?: string): string {
+  const isStandardDomain = CHECKOUT_DOMAIN.endsWith("fourthwall.com");
+  if (isStandardDomain) {
+    const currencyParam = currency ? `&currency=${currency}` : "";
+    return `https://${CHECKOUT_DOMAIN}/cart/checkout?cartId=${cartId}${currencyParam}`;
+  } else {
+    const currencyParam = currency ? `&cartCurrency=${currency}` : "";
+    return `https://${CHECKOUT_DOMAIN}/checkout/?cartId=${cartId}${currencyParam}`;
+  }
 }
